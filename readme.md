@@ -12,7 +12,12 @@ Welcome to the **GalaxyBot Coding Challenge** repository! This project was made 
     ```bash
     cd GalaxyBot\ Coding\ Challenge
     ```
-3. .env File:
+3. Install Node and deoendencies:
+    ```bash
+   npm init -y
+   npm install
+   ```
+4. .env File:
     ```bash
     touch .env
     ```
@@ -25,6 +30,7 @@ Welcome to the **GalaxyBot Coding Challenge** repository! This project was made 
 
 - Node.js (v14 or higher)
 - Any additional dependencies will be listed in the `package.json` file.
+- An Discord Application (can be created at the [Discord Developer Portal](https://dicord.com/developers/applications)
 
 
 ## License
