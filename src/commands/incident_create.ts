@@ -1,0 +1,45 @@
+// Imports
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, CommandInteractionOptionResolver, TextChannel } from 'discord.js';
+
+// Variables
+const incident_channel_id = '1363891501326668017';
+const incident_role_id = '1363891562961965247'; 
+
+// Database
+const sqlite = require('sqlite3').verbose();
+let db = new sqlite.Database('./database.db', sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE);
+
+export const data = new SlashCommandBuilder()
+.setName('incident_create')
+      // TODO: Command Name anpassen
+      .setDescription('Erstellt einenen neuen Incident')
+      .addStringOption(option => option.setName('title').setDescription('Titel des Incidents').setRequired(true))
+      .addStringOption(option => option.setName('description').setDescription('Beschreibung des Incidents').setRequired(true))
+
+export async function execute(interaction: ChatInputCommandInteraction) {
+    if (!interaction.member || !(interaction.member.roles as any).cache.has(incident_role_id)) {
+        await interaction.reply({ content: 'Du hast keine Berechtigung, diesen Befehl zu verwenden.', ephemeral: true });
+        return;
+      }
+  
+      const title = (interaction.options as CommandInteractionOptionResolver).getString('title');
+      const description = (interaction.options as CommandInteractionOptionResolver).getString('description');
+      const channel = interaction.guild?.channels.cache.get(incident_channel_id);
+      if (!channel || !channel.isTextBased() || !(channel instanceof TextChannel)) {
+        await interaction.reply({ content: 'Error, ask Bot Admin!', ephemeral: true });
+        return;
+      }
+      let embed = new EmbedBuilder()
+        .setColor('#FF0000')
+        .setTitle(`Incident - ${title}`)
+        .setDescription("Es gibt ein neues Incident!")
+        .addFields(
+          { name: "Beschreibung", value: description || "Keine Beschreibung angegeben" },
+          { name: "Status", value: "Offen" }
+        )
+        .setTimestamp(Date.now());
+        
+      let messageid = (await channel.send({embeds: [embed]})).id;
+      db.run(`INSERT INTO incidents (name, description, messageid, status, created_at) VALUES (?, ?, ?, ?, ?)`, [title, description, messageid, "open", Date.now()]);
+      await interaction.reply({ content: `Incident erstellt! ` , ephemeral: true });
+    }
