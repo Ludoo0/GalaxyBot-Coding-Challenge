@@ -30,7 +30,7 @@ Welcome to the **GalaxyBot Coding Challenge** repository! This project was made 
 
 - Node.js (v14 or higher)
 - Any additional dependencies will be listed in the `package.json` file.
-- An Discord Application (can be created at the [Discord Developer Portal](https://dicord.com/developers/applications)
+- An Discord Application (can be created at the [Discord Developer Portal](https://dicord.com/developers/applications))
 
 
 ## License
