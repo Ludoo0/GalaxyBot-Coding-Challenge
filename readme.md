@@ -6,13 +6,13 @@ Welcome to the **GalaxyBot Coding Challenge** repository! This project was made 
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-username/galaxybot-coding-challenge.git
+    git clone https://github.com/Ludoo0/galaxybot-coding-challenge.git
     ```
 2. Navigate to the project directory:
     ```bash
     cd GalaxyBot\ Coding\ Challenge
     ```
-3. Install Node and deoendencies:
+3. Install Node and dependencies:
     ```bash
    npm init -y
    npm install
