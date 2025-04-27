@@ -1,13 +1,11 @@
 // Imports
-import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, CommandInteractionOptionResolver, TextChannel } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, CommandInteractionOptionResolver, TextChannel, MessageFlags } from 'discord.js';
+import { db } from '../db';
 
 // Variables
 const incident_channel_id = '1363891501326668017';
 const incident_role_id = '1363891562961965247'; 
 
-// Database
-const sqlite = require('sqlite3').verbose();
-let db = new sqlite.Database('./database.db', sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE);
 
 export const data = new SlashCommandBuilder()
 .setName('incident_create')
@@ -18,7 +16,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction) {
     if (!interaction.member || !(interaction.member.roles as any).cache.has(incident_role_id)) {
-        await interaction.reply({ content: 'Du hast keine Berechtigung, diesen Befehl zu verwenden.', ephemeral: true });
+        await interaction.reply({ content: 'Du hast keine Berechtigung, diesen Befehl zu verwenden.', flags: MessageFlags.Ephemeral });
         return;
       }
   
@@ -26,7 +24,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       const description = (interaction.options as CommandInteractionOptionResolver).getString('description');
       const channel = interaction.guild?.channels.cache.get(incident_channel_id);
       if (!channel || !channel.isTextBased() || !(channel instanceof TextChannel)) {
-        await interaction.reply({ content: 'Error, ask Bot Admin!', ephemeral: true });
+        await interaction.reply({ content: 'Error, ask Bot Admin!', flags: MessageFlags.Ephemeral });
         return;
       }
       let embed = new EmbedBuilder()
@@ -41,5 +39,5 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         
       let messageid = (await channel.send({embeds: [embed]})).id;
       db.run(`INSERT INTO incidents (name, description, messageid, status, created_at) VALUES (?, ?, ?, ?, ?)`, [title, description, messageid, "open", Date.now()]);
-      await interaction.reply({ content: `Incident erstellt! ` , ephemeral: true });
+      await interaction.reply({ content: `Incident erstellt! ` , flags: MessageFlags.Ephemeral });
     }
