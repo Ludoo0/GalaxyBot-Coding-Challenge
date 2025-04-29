@@ -15,7 +15,7 @@ const incident_role_id = '1363891562961965247';
 export const data = new SlashCommandBuilder()
 .setName('incident_create')
       // TODO: Command Name anpassen
-      .setDescription('Erstellt einenen neuen Incident')
+      .setDescription('Erstellt einen neuen Incident')
       .addStringOption(option => option.setName('title').setDescription('Titel des Incidents').setRequired(true))
       .addStringOption(option => option.setName('description').setDescription('Beschreibung des Incidents').setRequired(true))
 
