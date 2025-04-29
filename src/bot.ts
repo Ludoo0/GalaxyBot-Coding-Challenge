@@ -2,7 +2,12 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
 import { commands } from './commands/'
-
+// import { db } from './db';
+import { openDb } from './db';
+let db: any;
+(async () => {
+  db = await openDb();
+})();
 
 dotenv.config(); // lädt die .env-Datei
 
@@ -10,10 +15,6 @@ dotenv.config(); // lädt die .env-Datei
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
 });
-
-// Database
-const sqlite = require('sqlite3').verbose();
-let db = new sqlite.Database('./database.db', sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE);
 
 
 // Online-Event
@@ -27,7 +28,7 @@ client.once('ready', async () => {
   console.log('Slash-Commands registriert:', commands.map(cmd => cmd.data.name).join(', '));
 
   // Create Database Table
-  db.run(`CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL)`)
+  await db.run(`CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL, appends INT NOT NULL)`,)
 });
 
 // Command-Handler
@@ -54,4 +55,5 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 // Login
+module.exports = db;
 client.login(process.env.BOT_TOKEN);
