@@ -5,5 +5,8 @@ export const data = new SlashCommandBuilder()
   .setDescription('Antwortet mit Pong!');
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  await interaction.reply('Pong!');
+  const start = Date.now();
+  await interaction.deferReply();
+  const latency = Date.now() - start;
+  await interaction.followUp('Pong!`' +latency + 'ms`');
 }
