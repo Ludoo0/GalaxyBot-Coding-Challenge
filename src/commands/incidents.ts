@@ -1,36 +1,43 @@
+// Imports
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
   MessageFlags,
   EmbedBuilder,
 } from "discord.js";
+// Data
 import { openDb } from "../db";
 let db: any;
 (async () => {
   db = await openDb();
 })();
 
+// Slash Command Data
 export const data = new SlashCommandBuilder()
   .setName("incidents")
   .setDescription("Show all open incidents");
 
+// Command Handler
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   let incidents: any = await db.all(
     `SELECT * FROM incidents WHERE status = ?`,
     ["open"]
   );
+  // Check if there are any incidents
   if (incidents.length === 0) {
     await interaction.editReply({
       content: "Es gibt keine offenen Incidents.",
     });
     return;
   }
+  // Build Embed
   let embed = new EmbedBuilder()
     .setTitle("Offene Incidents")
     .setColor("#0099ff")
     .setTimestamp()
     .setFooter({ text: "Incident-Tracker" });
+    // Add Incidents to Embed
   incidents.forEach((incident: any) => {
     if (!incident.appends || incident.appends.length === 0) {
       embed.addFields({
@@ -50,5 +57,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       });
     }
   });
+  // Send Embed
   await interaction.editReply({ embeds: [embed] });
 }

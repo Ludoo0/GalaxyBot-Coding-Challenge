@@ -3,13 +3,14 @@ import { Client, GatewayIntentBits, MessageFlags } from "discord.js";
 import dotenv from "dotenv";
 import { commands, loadCommands } from "./commands/";
 
+// Data
 import { openDb } from "./db";
 let db: any;
 (async () => {
   db = await openDb();
 })();
 
-dotenv.config(); // lädt die .env-Datei
+dotenv.config();
 
 // Client
 const client = new Client({
