@@ -10,7 +10,11 @@ import {
   Guild,
   ThreadChannel,
 } from "discord.js";
-import { db } from "../db";
+import { openDb } from "../db";
+let db: any;
+(async () => {
+  db = await openDb();
+})();
 
 // Variables
 const incident_channel_id = "1363891501326668017";
@@ -35,33 +39,28 @@ export const data = new SlashCommandBuilder()
 
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  console.log("Incident Append Command executed");
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  
   let thread: ThreadChannel
   if (interaction.member && !(interaction.member.roles as any).cache.has(incident_role_id)) {
-      console.log("User has no permission to use this command.");
       await interaction.editReply({ content: 'Du hast keine Berechtigung, diesen Befehl zu verwenden.' });
       return;
   }
 
-  let incident = db.get(`SELECT * FROM incidents WHERE id = ?`, [interaction.options.getInteger('incedentid')]) as any;
-  console.log(incident);
-  let allIncidents = db.all(`SELECT * FROM incidents`);
-  console.log(allIncidents);
-  if (!incident) {
-      await interaction.editReply({ content: 'Incident nicht gefunden.' });
-      console.log(incident);
-      return;
+  let incident: any = await db.get(`SELECT * FROM incidents WHERE id = ?`, [interaction.options.getInteger('incedentid')]);
+  if (incident === undefined) {
+    interaction.editReply({ content: 'Incident nicht gefunden.' });
+    return;
   }
   let comment = interaction.options.getString('comment');
   if (incident.status === 'closed') {
-    await interaction.reply({ content: 'Incident ist nicht offen.', flags: MessageFlags.Ephemeral });
+    await interaction.editReply({ content: 'Incident ist nicht offen.'});
     return;
   }
   if (incident.status === 'open') {
-    console.log("Incident is open, adding comment.");
     let channel = interaction.guild?.channels.cache.get(incident_channel_id) as TextChannel;
     let message = channel?.messages.fetch(incident.messageid);
+    let incident_count;
     if (message) {
       const fetchedMessage = await message;
       
@@ -69,9 +68,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         name: 'Incident - ' + incident.name,
         autoArchiveDuration: 60
       });
+      thread.setLocked(true);
+      incident_count = 1;
       let embed = new EmbedBuilder()
         .setColor('#FBE870')
-        .setTitle('Kommentar-' + incident.appends)
+        .setTitle('Kommentar #' + incident_count)
         .setDescription(comment || 'Kein Kommentar angegeben')
         .setTimestamp(Date.now());
       (thread)?.send({ embeds: [embed] });  
@@ -79,25 +80,31 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       await interaction.editReply({ content: 'Incident Nachricht nicht gefunden.' });
       return;
     }
+    db.run(`UPDATE incidents SET appends = ${incident_count} WHERE id = ?`, [incident.id]);
+    db.run(`UPDATE incidents SET status = 'appended' WHERE id = ?`, [incident.id]);
+    interaction.editReply({ content: 'Kommentar hinzugefügt.' });
   }
   if (incident.status === 'appended') {
+    let incident_count;
     let channel = interaction.guild?.channels.cache.get(incident_channel_id) as TextChannel;
     let message = channel?.messages.fetch(incident.messageid);
     if (message) {
       const fetchedMessage = await message;
-      
-      thread = await fetchedMessage.startThread({
-        name: 'Incident - ' + incident.name,
-        autoArchiveDuration: 60
-      });
-        
+      let thread = fetchedMessage.thread;
+
+      incident_count = incident.appends + 1;
       let embed = new EmbedBuilder()
         .setColor('#FBE870')
-        .setTitle('Kommentar-' + incident.appends)
+        .setTitle('Kommentar #' + incident.appends)
         .setDescription(comment || 'Kein Kommentar angegeben')
         .setTimestamp(Date.now());
       (thread)?.send({ embeds: [embed] });
+      db.run(`UPDATE incidents SET appends = ${incident_count} WHERE id = ?`, [incident.id]);
     }
       
+  }
+  if (incident.status === 'closed') {
+    await interaction.editReply({ content: 'Incident ist geschlossen.' });
+    return;
   }
 }

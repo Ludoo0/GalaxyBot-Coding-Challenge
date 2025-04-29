@@ -1,6 +1,11 @@
 // Imports
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, CommandInteractionOptionResolver, TextChannel, MessageFlags } from 'discord.js';
-import { db } from '../db';
+// import { db } from '../db';
+import { openDb } from '../db';
+let db: any;
+(async () => {
+  db = await openDb();
+})();
 
 // Variables
 const incident_channel_id = '1363891501326668017';
@@ -27,9 +32,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         await interaction.reply({ content: 'Error, ask Bot Admin!', flags: MessageFlags.Ephemeral });
         return;
       }
+      let incidents = await db.all(`SELECT * FROM incidents`);
+
       let embed = new EmbedBuilder()
         .setColor('#FF0000')
-        .setTitle(`Incident - ${title}`)
+        .setTitle(`Incident #${incidents.length + 1}- ${title}`)
         .setDescription("Es gibt ein neues Incident!")
         .addFields(
           { name: "Beschreibung", value: description || "Keine Beschreibung angegeben" },
@@ -38,6 +45,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         .setTimestamp(Date.now());
         
       let messageid = (await channel.send({embeds: [embed]})).id;
-      db.run(`INSERT INTO incidents (name, description, messageid, status, created_at) VALUES (?, ?, ?, ?, ?)`, [title, description, messageid, "open", Date.now()]);
+      db.run(`INSERT INTO incidents (name, description, messageid, status, created_at, appends) VALUES (?, ?, ?, ?, ?, ?)`, [title, description, messageid, "open", Date.now()]), 0;
       await interaction.reply({ content: `Incident erstellt! ` , flags: MessageFlags.Ephemeral });
     }
