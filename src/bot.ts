@@ -1,5 +1,5 @@
 // Imports
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, MessageFlags } from 'discord.js';
 import dotenv from 'dotenv';
 import { commands, loadCommands } from './commands/';
 
@@ -30,7 +30,7 @@ client.once('ready', async () => {
   console.log('Slash-Commands registriert:', commands.map(cmd => cmd.data.name).join(', '));
 
   // Create Database Table
-  await db.run(`CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL, appends INT)`,)
+  await db.run(`CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL, appends TEXT)`,)
 });
 
 // Command-Handler
@@ -40,7 +40,7 @@ client.on('interactionCreate', async (interaction) => {
 
   const command = commands.find(cmd => cmd.data.name === interaction.commandName);
   if (!command) {
-    await interaction.reply({ content: 'Unbekannter Command ', ephemeral: true });
+    await interaction.reply({ content: 'Unbekannter Command ', flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -52,7 +52,7 @@ client.on('interactionCreate', async (interaction) => {
     }
   } catch (err) {
     console.error(err);
-    await interaction.reply({ content: 'Fehler beim Ausführen des Befehls.', ephemeral: true });
+    await interaction.editReply({ content: 'Fehler beim Ausführen des Befehls.'});
   }
 });
 

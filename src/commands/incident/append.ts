@@ -17,8 +17,8 @@ let db: any;
 })();
 
 // Variables
-const incident_channel_id = "1363891501326668017";
-const incident_role_id = "1363891562961965247";
+const incident_channel_id = "1366759335916474399";
+const incident_role_id = "1366759363863122010";
 
 export const data = new SlashCommandSubcommandBuilder()
   .setName("append")
@@ -89,8 +89,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       });
       return;
     }
-    db.run(`UPDATE incidents SET appends = ${incident_count} WHERE id = ?`, [
-      incident.id,
+    let appends = [{description: comment, timestamp: Date.now()}];
+    let append_string = JSON.stringify(appends);
+    console.log(appends);
+    db.run(`UPDATE incidents SET appends = ? WHERE id = ?`, [
+      append_string, incident.id,
     ]);
     db.run(`UPDATE incidents SET status = 'appended' WHERE id = ?`, [
       incident.id,
@@ -98,25 +101,25 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     interaction.editReply({ content: "Kommentar hinzugefügt." });
   }
   if (incident.status === "appended") {
-    let incident_count;
     let channel = interaction.guild?.channels.cache.get(
       incident_channel_id
     ) as TextChannel;
     let message = channel?.messages.fetch(incident.messageid);
     if (message) {
       const fetchedMessage = await message;
+      let append_count = JSON.parse(incident.appends).length + 1;
       let thread = fetchedMessage.thread;
-
-      incident_count = incident.appends + 1;
       let embed = new EmbedBuilder()
         .setColor("#FBE870")
-        .setTitle("Kommentar #" + incident.appends)
+        .setTitle("Kommentar #" + append_count)
         .setDescription(comment || "Kein Kommentar angegeben")
         .setTimestamp(Date.now());
       thread?.send({ embeds: [embed] });
-      db.run(`UPDATE incidents SET appends = ${incident_count} WHERE id = ?`, [
-        incident.id,
-      ]);
+      let appends = JSON.parse(incident.appends);
+      appends.push({description: comment, timestamp: Date.now()});
+      let append_string = JSON.stringify(appends);
+      db.run(`UPDATE incidents SET appends = ? WHERE id = ?`, [append_string, incident.id]);
+      interaction.editReply({ content: "Kommentar hinzugefügt." });
     }
   }
   if (incident.status === "closed") {

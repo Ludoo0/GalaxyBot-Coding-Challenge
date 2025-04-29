@@ -15,8 +15,8 @@ let db: any;
 })();
 
 // Variables
-const incident_role_id = "1363891562961965247";
-const incident_channel_id = "1363891501326668017";
+const incident_role_id = "1366759363863122010";
+const incident_channel_id = "1366759335916474399";
 
 export const data = new SlashCommandSubcommandBuilder()
   .setName("close")
@@ -35,9 +35,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     !interaction.member ||
     !(interaction.member.roles as any).cache.has(incident_role_id)
   ) {
-    await interaction.reply({
-      content: "Du hast keine Berechtigung, diesen Befehl zu verwenden.",
-      flags: MessageFlags.Ephemeral,
+    await interaction.editReply({
+      content: "Du hast keine Berechtigung, diesen Befehl zu verwenden."
     });
     return;
   }

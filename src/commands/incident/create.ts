@@ -15,8 +15,8 @@ let db: any;
 })();
 
 // Variables
-const incident_channel_id = "1363891501326668017";
-const incident_role_id = "1363891562961965247";
+const incident_channel_id = "1366759335916474399";
+const incident_role_id = "1366759363863122010";
 
 export const data = new SlashCommandSubcommandBuilder()
   .setName("create")
@@ -35,17 +35,17 @@ export const data = new SlashCommandSubcommandBuilder()
   );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  
   if (
     !interaction.member ||
     !(interaction.member.roles as any).cache.has(incident_role_id)
   ) {
     await interaction.reply({
-      content: "Du hast keine Berechtigung, diesen Befehl zu verwenden.",
-      flags: MessageFlags.Ephemeral,
+      content: "Du hast keine Berechtigung, diesen Befehl zu verwenden.", flags: MessageFlags.Ephemeral
     });
     return;
   }
-
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const title = (
     interaction.options as CommandInteractionOptionResolver
   ).getString("title");
@@ -54,9 +54,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   ).getString("description");
   const channel = interaction.guild?.channels.cache.get(incident_channel_id);
   if (!channel || !channel.isTextBased() || !(channel instanceof TextChannel)) {
-    await interaction.reply({
-      content: "Error, ask Bot Admin!",
-      flags: MessageFlags.Ephemeral,
+    await interaction.editReply({
+      content: "Error, ask Bot Admin!"
     });
     return;
   }
@@ -79,10 +78,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   db.run(
     `INSERT INTO incidents (name, description, messageid, status, created_at, appends) VALUES (?, ?, ?, ?, ?, ?)`,
     [title, description, messageid, "open", Date.now()]
-  ),
-    0;
-  await interaction.reply({
-    content: `Incident erstellt! `,
-    flags: MessageFlags.Ephemeral,
+  );
+  await interaction.editReply({
+    content: `Incident erstellt! `
   });
 }
