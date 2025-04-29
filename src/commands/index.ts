@@ -10,19 +10,36 @@ export interface Command {
 const commandsPath = path.join(__dirname);
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file !== 'index.ts' && file.endsWith('.ts'));
 
-export const commands: Command[] = [];
+export let commands: Command[] = [];
 
-(async () => {
-  for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
+export async function loadCommands() {
+  const entries = fs.readdirSync(__dirname, { withFileTypes: true });
+  const loaded: Command[] = [];
+
+  for (const entry of entries) {
+    let filePath: string;
+    if (entry.isFile() && entry.name.endsWith('.ts') && entry.name !== 'index.ts') {
+      filePath = path.join(__dirname, entry.name);
+    } else if (entry.isDirectory()) {
+      const subIndex = path.join(__dirname, entry.name, 'index.ts');
+      if (fs.existsSync(subIndex)) {
+        filePath = subIndex;
+      } else {
+        continue;
+      }
+    } else {
+      continue;
+    }
+
     const commandModule = await import(filePath);
     if ('data' in commandModule && 'execute' in commandModule) {
-      commands.push({
+      loaded.push({
         data: commandModule.data,
         execute: commandModule.execute,
       });
-    } else {
-      console.warn(`[WARN] Die Datei "${file}" exportiert kein gültiges Command-Objekt.`);
     }
   }
-})();
+
+  commands = loaded;
+}
+

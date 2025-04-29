@@ -1,7 +1,7 @@
 // Imports
 import { Client, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
-import { commands } from './commands/'
+import { commands, loadCommands } from './commands/';
 
 import { openDb } from './db';
 let db: any;
@@ -22,13 +22,15 @@ client.once('ready', async () => {
   console.log(`${client.user?.tag} ist eingeloggt!`);
 
   //   Register Commands
+  await loadCommands();
   const slashCommands = commands.map(cmd => cmd.data.toJSON());
   await client.application?.commands.set(slashCommands);
+  
   // Log registered commands
   console.log('Slash-Commands registriert:', commands.map(cmd => cmd.data.name).join(', '));
 
   // Create Database Table
-  await db.run(`CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL, appends INT NOT NULL)`,)
+  await db.run(`CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL, appends INT)`,)
 });
 
 // Command-Handler
