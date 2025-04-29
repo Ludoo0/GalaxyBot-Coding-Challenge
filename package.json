@@ -7,6 +7,10 @@
     "build": "tsc",
     "start": "node dist/bot.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ludoo0/galaxybot-coding-challenge.git"
+  },
   "keywords": [],
   "author": "Ludoo",
   "license": "MIT",

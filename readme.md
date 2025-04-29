@@ -32,6 +32,14 @@ Welcome to the **GalaxyBot Coding Challenge** repository! This project was made 
 - Any additional dependencies will be listed in the `package.json` file.
 - An Discord Application (can be created at the [Discord Developer Portal](https://dicord.com/developers/applications))
 
+### Deploying
+To start the Bot, just follow the following steps:
+1. open the terminal
+2. type:
+    ```bash
+    npm run dev
+    ```
+
 
 ## License
 
