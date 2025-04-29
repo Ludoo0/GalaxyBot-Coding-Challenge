@@ -89,11 +89,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       });
       return;
     }
-    let appends = [{description: comment, timestamp: Date.now()}];
+    let appends = [{ description: comment, timestamp: Date.now() }];
     let append_string = JSON.stringify(appends);
     console.log(appends);
     db.run(`UPDATE incidents SET appends = ? WHERE id = ?`, [
-      append_string, incident.id,
+      append_string,
+      incident.id,
     ]);
     db.run(`UPDATE incidents SET status = 'appended' WHERE id = ?`, [
       incident.id,
@@ -116,9 +117,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         .setTimestamp(Date.now());
       thread?.send({ embeds: [embed] });
       let appends = JSON.parse(incident.appends);
-      appends.push({description: comment, timestamp: Date.now()});
+      appends.push({ description: comment, timestamp: Date.now() });
       let append_string = JSON.stringify(appends);
-      db.run(`UPDATE incidents SET appends = ? WHERE id = ?`, [append_string, incident.id]);
+      db.run(`UPDATE incidents SET appends = ? WHERE id = ?`, [
+        append_string,
+        incident.id,
+      ]);
       interaction.editReply({ content: "Kommentar hinzugefügt." });
     }
   }

@@ -36,7 +36,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     !(interaction.member.roles as any).cache.has(incident_role_id)
   ) {
     await interaction.editReply({
-      content: "Du hast keine Berechtigung, diesen Befehl zu verwenden."
+      content: "Du hast keine Berechtigung, diesen Befehl zu verwenden.",
     });
     return;
   }

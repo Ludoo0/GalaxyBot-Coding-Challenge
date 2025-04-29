@@ -1,9 +1,9 @@
 // Imports
-import { Client, GatewayIntentBits, MessageFlags } from 'discord.js';
-import dotenv from 'dotenv';
-import { commands, loadCommands } from './commands/';
+import { Client, GatewayIntentBits, MessageFlags } from "discord.js";
+import dotenv from "dotenv";
+import { commands, loadCommands } from "./commands/";
 
-import { openDb } from './db';
+import { openDb } from "./db";
 let db: any;
 (async () => {
   db = await openDb();
@@ -16,31 +16,39 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds],
 });
 
-
 // Online-Event
-client.once('ready', async () => {
+client.once("ready", async () => {
   console.log(`${client.user?.tag} ist eingeloggt!`);
 
   //   Register Commands
   await loadCommands();
-  const slashCommands = commands.map(cmd => cmd.data.toJSON());
+  const slashCommands = commands.map((cmd) => cmd.data.toJSON());
   await client.application?.commands.set(slashCommands);
-  
+
   // Log registered commands
-  console.log('Slash-Commands registriert:', commands.map(cmd => cmd.data.name).join(', '));
+  console.log(
+    "Slash-Commands registriert:",
+    commands.map((cmd) => cmd.data.name).join(", ")
+  );
 
   // Create Database Table
-  await db.run(`CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL, appends TEXT)`,)
+  await db.run(
+    `CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL, appends TEXT)`
+  );
 });
 
 // Command-Handler
-client.on('interactionCreate', async (interaction) => {
+client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
-
-  const command = commands.find(cmd => cmd.data.name === interaction.commandName);
+  const command = commands.find(
+    (cmd) => cmd.data.name === interaction.commandName
+  );
   if (!command) {
-    await interaction.reply({ content: 'Unbekannter Command ', flags: MessageFlags.Ephemeral });
+    await interaction.reply({
+      content: "Unbekannter Command ",
+      flags: MessageFlags.Ephemeral,
+    });
     return;
   }
 
@@ -48,11 +56,16 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.isChatInputCommand()) {
       await command.execute(interaction);
     } else {
-      await interaction.reply({ content: 'Dieser Command wird nicht unterstützt.', ephemeral: true });
+      await interaction.reply({
+        content: "Dieser Command wird nicht unterstützt.",
+        ephemeral: true,
+      });
     }
   } catch (err) {
     console.error(err);
-    await interaction.editReply({ content: 'Fehler beim Ausführen des Befehls.'});
+    await interaction.editReply({
+      content: "Fehler beim Ausführen des Befehls.",
+    });
   }
 });
 

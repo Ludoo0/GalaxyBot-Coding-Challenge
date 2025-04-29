@@ -35,13 +35,13 @@ export const data = new SlashCommandSubcommandBuilder()
   );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  
   if (
     !interaction.member ||
     !(interaction.member.roles as any).cache.has(incident_role_id)
   ) {
     await interaction.reply({
-      content: "Du hast keine Berechtigung, diesen Befehl zu verwenden.", flags: MessageFlags.Ephemeral
+      content: "Du hast keine Berechtigung, diesen Befehl zu verwenden.",
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
@@ -55,7 +55,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const channel = interaction.guild?.channels.cache.get(incident_channel_id);
   if (!channel || !channel.isTextBased() || !(channel instanceof TextChannel)) {
     await interaction.editReply({
-      content: "Error, ask Bot Admin!"
+      content: "Error, ask Bot Admin!",
     });
     return;
   }
@@ -80,6 +80,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     [title, description, messageid, "open", Date.now()]
   );
   await interaction.editReply({
-    content: `Incident erstellt! `
+    content: `Incident erstellt! `,
   });
 }

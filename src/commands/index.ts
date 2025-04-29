@@ -1,6 +1,6 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import fs from "node:fs";
+import path from "node:path";
+import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 
 export interface Command {
   data: SlashCommandBuilder;
@@ -8,7 +8,9 @@ export interface Command {
 }
 
 const commandsPath = path.join(__dirname);
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file !== 'index.ts' && file.endsWith('.ts'));
+const commandFiles = fs
+  .readdirSync(commandsPath)
+  .filter((file) => file !== "index.ts" && file.endsWith(".ts"));
 
 export let commands: Command[] = [];
 
@@ -18,10 +20,14 @@ export async function loadCommands() {
 
   for (const entry of entries) {
     let filePath: string;
-    if (entry.isFile() && entry.name.endsWith('.ts') && entry.name !== 'index.ts') {
+    if (
+      entry.isFile() &&
+      entry.name.endsWith(".ts") &&
+      entry.name !== "index.ts"
+    ) {
       filePath = path.join(__dirname, entry.name);
     } else if (entry.isDirectory()) {
-      const subIndex = path.join(__dirname, entry.name, 'index.ts');
+      const subIndex = path.join(__dirname, entry.name, "index.ts");
       if (fs.existsSync(subIndex)) {
         filePath = subIndex;
       } else {
@@ -32,7 +38,7 @@ export async function loadCommands() {
     }
 
     const commandModule = await import(filePath);
-    if ('data' in commandModule && 'execute' in commandModule) {
+    if ("data" in commandModule && "execute" in commandModule) {
       loaded.push({
         data: commandModule.data,
         execute: commandModule.execute,
@@ -42,4 +48,3 @@ export async function loadCommands() {
 
   commands = loaded;
 }
-
