@@ -2,7 +2,7 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
 import { commands } from './commands/'
-// import { db } from './db';
+
 import { openDb } from './db';
 let db: any;
 (async () => {
