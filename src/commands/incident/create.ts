@@ -80,6 +80,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     [title, description, messageid, "open", Date.now()]
   );
   await interaction.editReply({
-    content: `Incident erstellt! `,
+    content: `Incident erstellt! ID: ${incidents.length + 1}`,
   });
 }
