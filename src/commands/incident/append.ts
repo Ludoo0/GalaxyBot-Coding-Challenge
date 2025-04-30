@@ -16,8 +16,8 @@ let db: any;
 })();
 
 // Variables
-const incident_channel_id = "1366759335916474399";
-const incident_role_id = "1366759363863122010";
+const incident_channel_id: string = "1366759335916474399";
+const incident_role_id:string = "1366759363863122010";
 
 // Slash Command Data
 export const data = new SlashCommandSubcommandBuilder()
@@ -96,7 +96,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     }
     let appends = [{ description: comment, timestamp: Date.now() }];
     let append_string = JSON.stringify(appends);
-    console.log(appends);
     db.run(`UPDATE incidents SET appends = ? WHERE id = ?`, [
       append_string,
       incident.id,

@@ -64,8 +64,9 @@ client.on("interactionCreate", async (interaction) => {
     }
   } catch (err) {
     console.error(err);
-    await interaction.editReply({
+    await interaction.reply({
       content: "Fehler beim Ausführen des Befehls.",
+      flags: MessageFlags.Ephemeral
     });
   }
 });

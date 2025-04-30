@@ -6,6 +6,7 @@ import {
   CommandInteractionOptionResolver,
   TextChannel,
   MessageFlags,
+  Interaction
 } from "discord.js";
 // import { db } from '../db';
 import { openDb } from "../../db";
@@ -29,17 +30,18 @@ export const data = new SlashCommandSubcommandBuilder()
   );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  
 
   if (
     !interaction.member ||
     !(interaction.member.roles as any).cache.has(incident_role_id)
   ) {
-    await interaction.editReply({
+    await interaction.reply({
       content: "Du hast keine Berechtigung, diesen Befehl zu verwenden.",
     });
     return;
   }
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const incidentid = (
     interaction.options as CommandInteractionOptionResolver
   ).getInteger("incidentid");
@@ -83,4 +85,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   await db.run(`UPDATE incidents SET status = "closed" WHERE id = ?`, [
     incidentid,
   ]);
+  await interaction.editReply({
+    content: `Incident #${incidentid} wurde geschlossen!`,
+  });
+
 }

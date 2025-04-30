@@ -21,8 +21,8 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   let incidents: any = await db.all(
-    `SELECT * FROM incidents WHERE status = ?`,
-    ["open"]
+    `SELECT * FROM incidents WHERE status = ? OR status = ?`,
+    ["open", "appended"]
   );
   // Check if there are any incidents
   if (incidents.length === 0) {
@@ -37,7 +37,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     .setColor("#0099ff")
     .setTimestamp()
     .setFooter({ text: "Incident-Tracker" });
-    // Add Incidents to Embed
+  // Add Incidents to Embed
   incidents.forEach((incident: any) => {
     try {
       if (!incident.appends || incident.appends.length === 0) {
@@ -46,14 +46,15 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           value: incident.description + "\n" + `Letzter Append: kein Append`,
           inline: true,
         });
-      } else {
-        let lastAppend = incident.appends[incident.appends.length - 1];
+      } else { 
+        let lastAppend = JSON.parse(incident.appends)[JSON.parse(incident.appends).length - 1];
+        let timestamp = Math.floor(lastAppend.timestamp / 1000);
         embed.addFields({
-          name: `Incident #${incident.id}`,
+          name: `Incident #${incident.id} - ${incident.name}`,
           value:
-            incident.description +
-            "\n" +
-            `Letzter Append: ${lastAppend.description}, <t:${lastAppend.timestamp}:R>`,
+            "`"+ incident.description +
+            "`\n" +
+            "Letzter Append: "+lastAppend.description+", <t:"+timestamp+":R>",
           inline: true,
         });
       }
