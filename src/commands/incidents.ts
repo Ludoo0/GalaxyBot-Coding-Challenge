@@ -39,21 +39,28 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     .setFooter({ text: "Incident-Tracker" });
     // Add Incidents to Embed
   incidents.forEach((incident: any) => {
-    if (!incident.appends || incident.appends.length === 0) {
-      embed.addFields({
-        name: `Incident #${incident.id} - ${incident.name}`,
-        value: incident.description + "\n" + `Letzter Append: kein Append`,
-        inline: true,
-      });
-    } else {
-      let lastAppend = incident.appends[incident.appends.length - 1];
-      embed.addFields({
-        name: `Incident #${incident.id}`,
-        value:
-          incident.description +
-          "\n" +
-          `Letzter Append: ${lastAppend.description}, <t:${lastAppend.timestamp}:R>`,
-        inline: true,
+    try {
+      if (!incident.appends || incident.appends.length === 0) {
+        embed.addFields({
+          name: `Incident #${incident.id} - ${incident.name}`,
+          value: incident.description + "\n" + `Letzter Append: kein Append`,
+          inline: true,
+        });
+      } else {
+        let lastAppend = incident.appends[incident.appends.length - 1];
+        embed.addFields({
+          name: `Incident #${incident.id}`,
+          value:
+            incident.description +
+            "\n" +
+            `Letzter Append: ${lastAppend.description}, <t:${lastAppend.timestamp}:R>`,
+          inline: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error while adding incident to embed:", error);
+      interaction.editReply({
+        content: "Fehler beim Hinzufügen des Incidents zur Embed-Nachricht.",
       });
     }
   });

@@ -10,6 +10,8 @@ import {
   Guild,
   ThreadChannel,
 } from "discord.js";
+
+// Data
 import { openDb } from "../../db";
 let db: any;
 (async () => {
@@ -20,6 +22,7 @@ let db: any;
 const incident_channel_id = "1366759335916474399";
 const incident_role_id = "1366759363863122010";
 
+// Slash Command Data
 export const data = new SlashCommandSubcommandBuilder()
   .setName("append")
   .setDescription("Fügt einen neuen Kommentar zu einem Incident hinzu")
@@ -36,6 +39,7 @@ export const data = new SlashCommandSubcommandBuilder()
       .setRequired(true)
   );
 
+// Command Handler
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
@@ -70,12 +74,16 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     let incident_count;
     if (message) {
       const fetchedMessage = await message;
-
-      thread = await fetchedMessage.startThread({
-        name: "Incident - " + incident.name,
-        autoArchiveDuration: 60,
-      });
-      thread.setLocked(true);
+      if (!fetchedMessage.thread){
+        thread = await fetchedMessage.startThread({
+          name: "Incident - " + incident.name,
+          autoArchiveDuration: 60,
+        });
+        thread.setLocked(true);
+      } else {
+        thread = fetchedMessage.thread;
+      }
+      
       incident_count = 1;
       let embed = new EmbedBuilder()
         .setColor("#FBE870")

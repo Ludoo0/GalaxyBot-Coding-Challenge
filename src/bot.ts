@@ -1,5 +1,5 @@
 // Imports
-import { Client, GatewayIntentBits, MessageFlags } from "discord.js";
+import { Client, GatewayIntentBits, MessageFlags, Interaction } from "discord.js";
 import dotenv from "dotenv";
 import { commands, loadCommands } from "./commands/";
 
@@ -34,7 +34,7 @@ client.once("ready", async () => {
 
   // Create Database Table
   await db.run(
-    `CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL, appends TEXT)`
+    `CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT CHECK( status IN ('open', 'appended', 'closed') ) NOT NULL, created_at TIMESTAMP NOT NULL, appends TEXT)`
   );
 });
 
@@ -59,7 +59,7 @@ client.on("interactionCreate", async (interaction) => {
     } else {
       await interaction.reply({
         content: "Dieser Command wird nicht unterstützt.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral
       });
     }
   } catch (err) {
