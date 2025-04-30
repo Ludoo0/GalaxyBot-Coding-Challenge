@@ -1,5 +1,5 @@
 // Imports
-import { Client, GatewayIntentBits, MessageFlags, Interaction } from "discord.js";
+import { Client, GatewayIntentBits, MessageFlags } from "discord.js";
 import dotenv from "dotenv";
 import { commands, loadCommands } from "./commands/";
 

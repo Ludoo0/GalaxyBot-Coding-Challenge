@@ -3,11 +3,8 @@ import {
   SlashCommandSubcommandBuilder,
   ChatInputCommandInteraction,
   EmbedBuilder,
-  CommandInteractionOptionResolver,
   TextChannel,
   MessageFlags,
-  Message,
-  Guild,
   ThreadChannel,
 } from "discord.js";
 
