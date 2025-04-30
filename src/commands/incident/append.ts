@@ -136,8 +136,4 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       interaction.editReply({ content: "Kommentar hinzugefügt." });
     }
   }
-  if (incident.status === "closed") {
-    await interaction.editReply({ content: "Incident ist geschlossen." });
-    return;
-  }
 }
