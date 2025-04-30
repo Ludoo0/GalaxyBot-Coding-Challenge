@@ -43,7 +43,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       if (!incident.appends || incident.appends.length === 0) {
         embed.addFields({
           name: `Incident #${incident.id} - ${incident.name}`,
-          value: incident.description + "\n" + `Letzter Append: kein Append`,
+          value: "`"+incident.description + "`\n" + `Letzter Append: kein Append`,
           inline: true,
         });
       } else { 

@@ -7,16 +7,15 @@ import {
   TextChannel,
   MessageFlags,
 } from "discord.js";
-// import { db } from '../db';
+
+
+// Data
+import { getSettings } from "../settings";
 import { openDb } from "../../db";
 let db: any;
 (async () => {
   db = await openDb();
 })();
-
-// Variables
-const incident_channel_id = "1366759335916474399";
-const incident_role_id = "1366759363863122010";
 
 export const data = new SlashCommandSubcommandBuilder()
   .setName("create")
@@ -35,6 +34,14 @@ export const data = new SlashCommandSubcommandBuilder()
   );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  // Variables
+  if (!interaction.guildId) {
+    await interaction.editReply({ content: "Guild ID ist nicht verfügbar." });
+    return;
+  }
+  const incident_channel_id: string = (await getSettings(interaction.guildId)).channel_id;
+  const incident_role_id: string = (await getSettings(interaction.guildId)).role_id;
+  
   if (
     !interaction.member ||
     !(interaction.member.roles as any).cache.has(incident_role_id)

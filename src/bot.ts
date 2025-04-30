@@ -36,6 +36,10 @@ client.once("ready", async () => {
   await db.run(
     `CREATE TABLE IF NOT EXISTS incidents(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, messageid TEXT NOT NULL, status TEXT CHECK( status IN ('open', 'appended', 'closed') ) NOT NULL, created_at TIMESTAMP NOT NULL, appends TEXT)`
   );
+  await db.run(
+    `CREATE TABLE IF NOT EXISTS settings(guild_id TEXT NOT NULL PRIMARY KEY, role_id TEXT NOT NULL, channel_id TEXT NOT NULL)`
+  );
+
 });
 
 // Command-Handler

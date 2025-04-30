@@ -8,16 +8,14 @@ import {
   ThreadChannel,
 } from "discord.js";
 
+
 // Data
+import { getSettings } from "../settings";
 import { openDb } from "../../db";
 let db: any;
 (async () => {
   db = await openDb();
 })();
-
-// Variables
-const incident_channel_id: string = "1366759335916474399";
-const incident_role_id:string = "1366759363863122010";
 
 // Slash Command Data
 export const data = new SlashCommandSubcommandBuilder()
@@ -39,6 +37,14 @@ export const data = new SlashCommandSubcommandBuilder()
 // Command Handler
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  // Variables
+  if (!interaction.guildId) {
+    await interaction.editReply({ content: "Guild ID ist nicht verfügbar." });
+    return;
+  }
+  const incident_channel_id: string = (await getSettings(interaction.guildId)).channel_id;
+  const incident_role_id: string = (await getSettings(interaction.guildId)).role_id;
+
 
   let thread: ThreadChannel;
   if (
